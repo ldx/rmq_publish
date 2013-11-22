@@ -1,0 +1,12 @@
+{application, rmq_publish,
+ [
+  {description, ""},
+  {vsn, "0.1.0-dev"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, { rmq_publish_app, []}},
+  {env, []}
+ ]}.
