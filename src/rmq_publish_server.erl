@@ -11,7 +11,7 @@
          get_queue_size/1]).
 
 -record(state, {channel, connection, exchange, key, last_sent, last_acked,
-                headers, immediate, mandatory}).
+                headers, immediate, mandatory, content_type}).
 
 %% ===================================================================
 %% API
@@ -47,6 +47,7 @@ init(Args) ->
     Headers = proplists:get_value(headers, Args),
     Immediate = proplists:get_value(immediate, Args, false),
     Mandatory = proplists:get_value(mandatory, Args, false),
+    ContentType = proplists:get_value(content_type, Args),
     {ok, Params} = amqp_uri:parse(Uri),
     {ok, Connection} = amqp_connection:start(Params),
     {ok, Channel} = amqp_connection:open_channel(Connection),
@@ -58,7 +59,8 @@ init(Args) ->
     {ok, #state{channel = Channel, connection = Connection,
                 exchange = Exchange, key = Key, last_sent = 0, last_acked = 0,
                 headers = Headers, immediate = Immediate,
-                mandatory = Mandatory}}.
+                mandatory = Mandatory,
+                content_type = ContentType}}.
 
 handle_info(#'basic.ack'{delivery_tag = Tag, multiple = _Multiple}, State) ->
     NewState = State#state{last_acked = Tag},
@@ -125,7 +127,8 @@ handle_cast({send, Payload}, State) ->
                                routing_key = State#state.key,
                                immediate = State#state.immediate,
                                mandatory = State#state.mandatory},
-    Msg = #amqp_msg{props = #'P_basic'{headers = State#state.headers},
+    Msg = #amqp_msg{props = #'P_basic'{headers = State#state.headers,
+                        content_type = erlang:list_to_bitstring(State#state.content_type)},
                     payload = Payload},
     ok = amqp_channel:cast(State#state.channel, Publish, Msg),
     NewState = State#state{last_sent = MessageId},
