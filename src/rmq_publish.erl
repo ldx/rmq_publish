@@ -34,7 +34,7 @@ main(Args) ->
      {immediate, undefined, "immediate", boolean, "Set immediate flag."},
      {mandatory, undefined, "mandatory", boolean, "Set mandatory flag."},
      {version, $v, "version", undefined, "Show version info."},
-     {content_type, $c, "content_type", {string, "application/octet-stream"},
+     {content_type, $C, "content_type", {string, "application/octet-stream"},
         "Set the ContentType for every message."},
      {help, $h, "help", undefined, "Show usage info."}],
     {ok, {Props, Leftover}} = getopt:parse(OptSpecList, Args),
